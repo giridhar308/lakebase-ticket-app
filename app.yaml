@@ -1,0 +1,7 @@
+command: ['streamlit', 'run', 'app.py']
+env:
+  - name: 'STREAMLIT_GATHER_USAGE_STATS'
+    value: 'false'
+# No PG*/Lakebase environment variables are needed — the Lakebase URL is
+# entered live in the app's "Connect to Lakebase" form on first load
+# (see README.md).
