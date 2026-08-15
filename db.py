@@ -75,10 +75,8 @@ def parse_lakebase_url(raw: str) -> dict:
 
 
 def _schema_name(conn: dict) -> str:
-    schema = conn.get("schema") or "public"
-    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", schema):
-        raise ValueError(f"Invalid schema name: {schema!r}")
-    return schema
+    """Always return 'public' schema regardless of connection settings."""
+    return "public"
 
 
 def _table_names(conn: dict):
@@ -188,12 +186,11 @@ CREATE INDEX IF NOT EXISTS idx_ticket_messages_ticket_id
 
 
 def init_db(conn: dict):
-    schema = _schema_name(conn)
+    """Initialize database tables in the public schema."""
     tickets, messages = _table_names(conn)
     ddl = _DDL_TEMPLATE.format(tickets=tickets, messages=messages)
     with db_cursor(conn, commit=True) as cur:
-        if schema != "public":
-            cur.execute(f"CREATE SCHEMA IF NOT EXISTS {schema}")
+        # Tables are always created in the public schema
         cur.execute(ddl)
 
 
@@ -246,3 +243,18 @@ def add_message(conn: dict, ticket_id: int, message_text: str, author: str):
     q = f"INSERT INTO {messages} (ticket_id, message_text, author) VALUES (%s, %s, %s)"
     with db_cursor(conn, commit=True) as cur:
         cur.execute(q, (ticket_id, message_text, author))
+
+
+def update_message(conn: dict, message_id: int, message_text: str):
+    """Update an existing message's text."""
+    _, messages = _table_names(conn)
+    q = f"UPDATE {messages} SET message_text = %s WHERE message_id = %s"
+    with db_cursor(conn, commit=True) as cur:
+        cur.execute(q, (message_text, message_id))
+
+
+def update_message(conn: dict, message_id: int, message_text: str):
+    _, messages = _table_names(conn)
+    q = f"UPDATE {messages} SET message_text = %s WHERE message_id = %s"
+    with db_cursor(conn, commit=True) as cur:
+        cur.execute(q, (message_text, message_id))

@@ -2,6 +2,9 @@ command: ['streamlit', 'run', 'app.py']
 env:
   - name: 'STREAMLIT_GATHER_USAGE_STATS'
     value: 'false'
-# No PG*/Lakebase environment variables are needed — the Lakebase URL is
-# entered live in the app's "Connect to Lakebase" form on first load
-# (see README.md).
+# Lakebase credentials are read from Databricks secrets.
+# Required secret scope: 'lakebase-app'
+# Required secrets:
+#   - lakebase_connection_string: Full Postgres connection string
+#                                 (postgresql://user:password@host:port/database)
+# Note: Tables are always created in the 'public' schema.
